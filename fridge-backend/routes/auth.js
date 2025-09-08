@@ -8,9 +8,16 @@ const router = express.Router();
 // POST /auth/register
 router.post('/register', async (req, res) => {
   const { email, password } = req.body;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex for validation
 
-  if (!email || !password || password.length < 8) {
-    return res.status(400).json({ error: 'Invalid email or password' });
+  if (!emailRegex.test(email)) { // checks if a string matches the pattern defined by the regex
+    return res.status(400).json({ error: 'Email is not valid' });
+  }
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters long' });
   }
 
   const existingUser = await User.findOne({ email });
@@ -35,6 +42,12 @@ router.post('/login', async (req, res) => {
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
   res.json({ token });
+});
+
+// GET /auth/users
+router.get('/users', async (req, res) => {
+  const users = await User.find({}, 'email'); // Only return email field
+  res.json(users);
 });
 
 module.exports = router;
