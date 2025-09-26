@@ -4,7 +4,9 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const itemRoutes = require('./routes/items');
 
+app.use('/items', itemRoutes);
 // Load .env
 dotenv.config();
 
